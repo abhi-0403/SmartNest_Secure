@@ -1,35 +1,36 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
+import { Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { View, StyleSheet } from "react-native";
 
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
+export default function RootLayout() {
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
-    </Tabs>
+    <GestureHandlerRootView style={styles.root}>
+      <SafeAreaProvider>
+        {/* Status Bar */}
+        <StatusBar style="dark" backgroundColor="#F4F5F7" />
+
+        {/* Safe Area Wrapper */}
+        <SafeAreaView style={styles.safeArea} edges={["top"]}>
+          <View style={styles.content}>
+            <Stack screenOptions={{ headerShown: false }} />
+          </View>
+        </SafeAreaView>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: "#F4F5F7",
+  },
+  safeArea: {
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+  },
+});

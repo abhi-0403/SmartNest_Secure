@@ -21,47 +21,66 @@ const useSpeechRecognitionEvent = (_e: string, _cb: any) => {};
 const { width } = Dimensions.get('window');
 
 /* ══════════════════════════════════════════
-   THEME
+   LIGHT THEME — Soft White + Teal Mint + Slate
 ══════════════════════════════════════════ */
 const THEME = {
-  bg:          '#0A0A14',
-  surface:     '#12121F',
-  border:      '#1E1E3A',
-  accent:      '#6C63FF',
-  accentSoft:  'rgba(108,99,255,0.15)',
-  success:     '#22D3A5',
-  successSoft: 'rgba(34,211,165,0.12)',
-  warning:     '#F59E0B',
-  warningSoft: 'rgba(245,158,11,0.12)',
-  danger:      '#FF5757',
-  dangerSoft:  'rgba(255,87,87,0.12)',
-  sky:         '#38BDF8',
-  skySoft:     'rgba(56,189,248,0.12)',
-  yellow:      '#FCD34D',
-  yellowSoft:  'rgba(252,211,77,0.12)',
-  textPrimary: '#F0EEFF',
-  textSecond:  '#8B84C4',
-  textMuted:   '#4A4580',
+  // Backgrounds
+  bg:            '#F4F6FA',
+  surface:       '#FFFFFF',
+  surfaceAlt:    '#EEF1F8',
+  card:          '#FFFFFF',
+
+  // Borders
+  border:        '#E2E8F0',
+  borderLight:   '#EDF2F7',
+
+  // Accent — deep teal
+  accent:        '#0EA5E9',
+  accentDark:    '#0284C7',
+  accentSoft:    '#E0F2FE',
+
+  // Secondary accent — violet
+  violet:        '#7C3AED',
+  violetSoft:    '#EDE9FE',
+
+  // Semantic
+  success:       '#059669',
+  successSoft:   '#D1FAE5',
+  warning:       '#D97706',
+  warningSoft:   '#FEF3C7',
+  danger:        '#DC2626',
+  dangerSoft:    '#FEE2E2',
+  sky:           '#0EA5E9',
+  skySoft:       '#E0F2FE',
+  yellow:        '#D97706',
+  yellowSoft:    '#FEF3C7',
+  amber:         '#F59E0B',
+  amberSoft:     '#FFFBEB',
+
+  // Text
+  textPrimary:   '#0F172A',
+  textSecond:    '#475569',
+  textMuted:     '#94A3B8',
+  textInverse:   '#FFFFFF',
+
+  // Shadow
+  shadow:        'rgba(15,23,42,0.08)',
+  shadowMd:      'rgba(15,23,42,0.12)',
 };
 
-/* ══════════════════════════════════════════
-   MAIN SCREEN
-══════════════════════════════════════════ */
 export default function HomeScreen() {
-
   const [lightOn,     setLightOn]     = useState(false);
   const [fanOn,       setFanOn]       = useState(false);
   const [secureMode,  setSecureMode]  = useState(false);
   const [temperature, setTemperature] = useState<number>(0);
   const [humidity,    setHumidity]    = useState<number>(0);
-  const [gasLevel,    setGasLevel]    = useState<number>(0);
+  const [gasLevel,    setGasLevel]     = useState<number>(0);
   const [motion,      setMotion]      = useState(false);
-  const [fireStatus,  setFireStatus]  = useState(false);
-  const [micActive,   setMicActive]   = useState(false);
+  const [fireStatus,  setFireStatus]   = useState(false);
+  const [micActive,   setMicActive]    = useState(false);
 
   const pathname = usePathname();
 
-  /* ── Animations ── */
   const scaleAnim   = useRef(new Animated.Value(1)).current;
   const pulseRef    = useRef<Animated.CompositeAnimation | null>(null);
   const headerAnim  = useRef(new Animated.Value(0)).current;
@@ -72,7 +91,6 @@ export default function HomeScreen() {
   const fanRotRef   = useRef<Animated.CompositeAnimation | null>(null);
   const liveDotAnim = useRef(new Animated.Value(1)).current;
 
-  /* ── Mount animations ── */
   useEffect(() => {
     Animated.parallel([
       Animated.timing(headerAnim, {
@@ -91,23 +109,21 @@ export default function HomeScreen() {
       ]),
     ]).start();
 
-    /* Live dot breathe */
     Animated.loop(Animated.sequence([
       Animated.timing(liveDotAnim, { toValue: 0.2, duration: 900, useNativeDriver: true }),
       Animated.timing(liveDotAnim, { toValue: 1,   duration: 900, useNativeDriver: true }),
     ])).start();
   }, []);
 
-  /* ── Fire pulse ── */
   useEffect(() => {
     if (fireStatus) {
       Animated.loop(Animated.sequence([
         Animated.timing(firePulse, {
-          toValue: 1.04, duration: 400,
+          toValue: 1.03, duration: 450,
           easing: Easing.inOut(Easing.ease), useNativeDriver: true,
         }),
         Animated.timing(firePulse, {
-          toValue: 1, duration: 400,
+          toValue: 1, duration: 450,
           easing: Easing.inOut(Easing.ease), useNativeDriver: true,
         }),
       ])).start();
@@ -117,12 +133,11 @@ export default function HomeScreen() {
     }
   }, [fireStatus]);
 
-  /* ── Fan spin ── */
   useEffect(() => {
     if (fanOn) {
       fanRotRef.current = Animated.loop(
         Animated.timing(fanRotate, {
-          toValue: 1, duration: 1200,
+          toValue: 1, duration: 1000,
           easing: Easing.linear, useNativeDriver: true,
         })
       );
@@ -135,23 +150,25 @@ export default function HomeScreen() {
 
   const fanSpin = fanRotate.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
 
-  /* ── Mic pulse ── */
   const startPulse = () => {
     pulseRef.current = Animated.loop(Animated.sequence([
       Animated.timing(scaleAnim, {
-        toValue: 1.2, duration: 600,
+        toValue: 1.18, duration: 550,
         easing: Easing.inOut(Easing.ease), useNativeDriver: true,
       }),
       Animated.timing(scaleAnim, {
-        toValue: 1, duration: 600,
+        toValue: 1, duration: 550,
         easing: Easing.inOut(Easing.ease), useNativeDriver: true,
       }),
     ]));
     pulseRef.current.start();
   };
-  const stopPulse = () => { pulseRef.current?.stop(); scaleAnim.setValue(1); };
 
-  /* ── Voice commands ── */
+  const stopPulse = () => {
+    pulseRef.current?.stop();
+    scaleAnim.setValue(1);
+  };
+
   const handleVoiceCommand = (text: string) => {
     const cmd = text.trim().toLowerCase();
     if      (cmd === 'turn on light')       set(ref(database, 'devices/light'), true);
@@ -166,11 +183,15 @@ export default function HomeScreen() {
     if (event.results?.length > 0) {
       handleVoiceCommand(event.results[0]?.transcript ?? '');
       ExpoSpeechRecognitionModule.stop();
-      setMicActive(false); stopPulse();
+      setMicActive(false);
+      stopPulse();
     }
   });
+
   useSpeechRecognitionEvent('error', () => {
-    ExpoSpeechRecognitionModule.stop(); setMicActive(false); stopPulse();
+    ExpoSpeechRecognitionModule.stop();
+    setMicActive(false);
+    stopPulse();
   });
 
   const handleMicPress = async () => {
@@ -184,11 +205,11 @@ export default function HomeScreen() {
         lang: 'en-US', interimResults: false, maxAlternatives: 1, continuous: false,
       });
     } else {
-      stopPulse(); ExpoSpeechRecognitionModule.stop();
+      stopPulse();
+      ExpoSpeechRecognitionModule.stop();
     }
   };
 
-  /* ── Firebase ── */
   useEffect(() => {
     const u1 = onValue(ref(database, 'devices'), (snap) => {
       const d = snap.val();
@@ -211,61 +232,58 @@ export default function HomeScreen() {
     return () => { u1(); u2(); u3(); };
   }, []);
 
-  const goHome = () => { if (pathname !== '/') router.replace('/'); };
-  const goLogs = () => { if (pathname !== '/logs') router.replace('/logs'); };
+  const goHome      = () => { if (pathname !== '/')         router.replace('/'); };
+  const goLogs      = () => { if (pathname !== '/logs')     router.replace('/logs'); };
+  const goEmergency = () => { if (pathname !== '/emergency') router.push('/emergency'); };
 
-  /* ── Derived values — all pre-built as plain strings ── */
-  const gasColor  = gasLevel > 780 ? THEME.danger  : gasLevel > 500 ? THEME.warning  : THEME.success;
-  const gasBg     = gasLevel > 780 ? THEME.dangerSoft : gasLevel > 500 ? THEME.warningSoft : THEME.successSoft;
-  const gasBadge  = gasLevel > 780 ? 'DANGER' : gasLevel > 500 ? 'WARN' : '';
+  const gasColor = gasLevel > 780 ? THEME.danger  : gasLevel > 500 ? THEME.warning  : THEME.success;
+  const gasBg    = gasLevel > 780 ? THEME.dangerSoft : gasLevel > 500 ? THEME.warningSoft : THEME.successSoft;
+  const gasBadge = gasLevel > 780 ? 'DANGER' : gasLevel > 500 ? 'WARN' : '';
 
   const activeDevices      = [lightOn, fanOn].filter(Boolean).length;
-  const activeDevicesLabel = activeDevices === 0 ? 'None active' : String(activeDevices) + ' active';
+  const activeDevicesLabel = activeDevices === 0 ? 'None active' : `${activeDevices} active`;
 
-  const tempLabel   = String(temperature) + '\u00B0C';   // °
-  const humidLabel  = String(humidity) + '%';
+  const tempLabel  = `${temperature}°C`;
+  const humidLabel = `${humidity}%`;
 
-  const secureSub   = secureMode  ? 'Armed - SMS alerts active' : 'Tap switch to arm';
-  const lightSub    = lightOn     ? 'On - Room illuminated'     : 'Off - Tap to turn on';
-  const fanSubText  = fanOn       ? 'Running - Full speed'      : 'Off - Tap to turn on';
+  const secureSub  = secureMode ? 'Armed · SMS alerts active' : 'Tap to arm the system';
+  const lightSub   = lightOn    ? 'On · Room illuminated'     : 'Off · Tap to turn on';
+  const fanSubText = fanOn      ? 'Running · Full speed'      : 'Off · Tap to turn on';
 
-  const tempVal   = String(temperature) + '\u00B0C';
-  const humVal    = String(humidity) + '%';
   const gasVal    = String(gasLevel);
   const motionVal = motion ? 'Detected' : 'Clear';
 
-  const fireMainText  = fireStatus ? 'FIRE DETECTED' : 'No Fire Detected';
-  const fireSub       = fireStatus ? 'Take action immediately!' : 'System is monitoring';
-  const fireBadgeText = fireStatus ? 'ALERT' : 'ALL CLEAR';
-
-  const headerTranslateY = headerAnim.interpolate({ inputRange: [0, 1], outputRange: [-20, 0] });
+  const fireMainText  = fireStatus ? 'FIRE DETECTED'    : 'No Fire Detected';
+  const fireSub       = fireStatus ? 'Take action now!' : 'System monitoring';
+  const fireBadgeText = fireStatus ? 'ALERT'            : 'ALL CLEAR';
 
   return (
     <View style={s.root}>
-      {/*
-        style="light"      → white icons/text on the status bar
-        translucent        → status bar sits on top of content (no coloured strip)
-        backgroundColor    → Android: the semi-transparent strip behind icons stays dark
-      */}
-      <StatusBar style="light" translucent backgroundColor="rgba(13,13,31,0.95)" />
+      {/* Light status bar — system UI (clock, battery, signal) will show in dark/black */}
+      <StatusBar style="dark" translucent backgroundColor="transparent" />
 
-      {/* ── HEADER ── */}
-      <Animated.View style={{ opacity: headerAnim, transform: [{ translateY: headerTranslateY }] }}>
-        <LinearGradient
-          colors={['#0D0D1F', '#12122A', '#0A0A18']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={s.header}
-        >
-          <View style={s.headerOrb} />
-          <View style={s.headerOrb2} />
+      {/* ── HEADER — SafeAreaView outside so no gap above gradient ── */}
+      <SafeAreaView edges={['top']} style={s.safeHeader}>
+        <Animated.View style={{ opacity: headerAnim }}>
+          <LinearGradient
+            colors={['#FFFFFF', '#F8FAFF']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={s.header}
+          >
+            {/* Subtle decorative orbs */}
+            <View style={s.headerOrb} />
+            <View style={s.headerOrb2} />
 
-          <SafeAreaView edges={['top']}>
             <View style={s.headerInner}>
-
               {/* Brand */}
               <View style={s.headerBrand}>
-                <LinearGradient colors={[THEME.accent, '#9B8CFF']} style={s.headerIconGrad}>
+                <LinearGradient
+                  colors={[THEME.accent, THEME.accentDark]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={s.headerIconGrad}
+                >
                   <MaterialIcons name="home" size={20} color="#FFFFFF" />
                 </LinearGradient>
                 <View>
@@ -274,10 +292,13 @@ export default function HomeScreen() {
                 </View>
               </View>
 
-              {/* Pills */}
+              {/* Right pills */}
               <View style={s.headerRight}>
                 <View style={s.deviceCountPill}>
-                  <Text style={s.deviceCountText}>{activeDevicesLabel}</Text>
+                  <View style={[s.pillDot, { backgroundColor: activeDevices > 0 ? THEME.accent : THEME.textMuted }]} />
+                  <Text style={[s.deviceCountText, { color: activeDevices > 0 ? THEME.accent : THEME.textMuted }]}>
+                    {activeDevicesLabel}
+                  </Text>
                 </View>
                 <View style={s.livePill}>
                   <Animated.View style={[s.liveDot, { opacity: liveDotAnim }]} />
@@ -286,33 +307,42 @@ export default function HomeScreen() {
               </View>
             </View>
 
-            {/* Stats bar */}
+            {/* Stats strip */}
             <View style={s.headerStats}>
               <View style={s.headerStat}>
-                <MaterialIcons name="thermostat" size={14} color={THEME.warning} />
+                <View style={[s.statIcon, { backgroundColor: THEME.warningSoft }]}>
+                  <MaterialIcons name="thermostat" size={13} color={THEME.warning} />
+                </View>
                 <Text style={s.headerStatVal}>{tempLabel}</Text>
               </View>
               <View style={s.headerStatDivider} />
               <View style={s.headerStat}>
-                <MaterialIcons name="water-drop" size={14} color={THEME.sky} />
+                <View style={[s.statIcon, { backgroundColor: THEME.skySoft }]}>
+                  <MaterialIcons name="water-drop" size={13} color={THEME.sky} />
+                </View>
                 <Text style={s.headerStatVal}>{humidLabel}</Text>
               </View>
               <View style={s.headerStatDivider} />
               <View style={s.headerStat}>
-                <MaterialIcons
-                  name={secureMode ? 'lock' : 'lock-open'}
-                  size={14}
-                  color={secureMode ? THEME.danger : THEME.textMuted}
-                />
+                <View style={[s.statIcon, {
+                  backgroundColor: secureMode ? THEME.dangerSoft : THEME.surfaceAlt,
+                }]}>
+                  <MaterialIcons
+                    name={secureMode ? 'lock' : 'lock-open'}
+                    size={13}
+                    color={secureMode ? THEME.danger : THEME.textMuted}
+                  />
+                </View>
                 <Text style={[s.headerStatVal, { color: secureMode ? THEME.danger : THEME.textMuted }]}>
                   {secureMode ? 'Armed' : 'Disarmed'}
                 </Text>
               </View>
             </View>
-          </SafeAreaView>
-        </LinearGradient>
-      </Animated.View>
+          </LinearGradient>
+        </Animated.View>
+      </SafeAreaView>
 
+      {/* ── SCROLL BODY ── */}
       <ScrollView
         style={s.scroll}
         showsVerticalScrollIndicator={false}
@@ -320,10 +350,10 @@ export default function HomeScreen() {
       >
         <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
 
-          {/* ── FIRE ALERT BANNER ── */}
+          {/* Fire alert banner */}
           {fireStatus ? (
-            <Animated.View style={{ transform: [{ scale: firePulse }], marginBottom: 16 }}>
-              <LinearGradient colors={['#FF3B3B', '#CC0000']} style={s.fireBanner}>
+            <Animated.View style={{ transform: [{ scale: firePulse }], marginBottom: 14 }}>
+              <LinearGradient colors={['#DC2626', '#B91C1C']} style={s.fireBanner}>
                 <View style={s.fireBannerIcon}>
                   <MaterialIcons name="local-fire-department" size={22} color="#FFFFFF" />
                 </View>
@@ -331,169 +361,148 @@ export default function HomeScreen() {
                   <Text style={s.fireBannerTitle}>{fireMainText}</Text>
                   <Text style={s.fireBannerSub}>{fireSub}</Text>
                 </View>
-                <MaterialIcons name="warning" size={20} color="rgba(255,255,255,0.6)" />
+                <MaterialIcons name="warning" size={20} color="rgba(255,255,255,0.7)" />
               </LinearGradient>
             </Animated.View>
           ) : null}
 
-          {/* ── SECURITY ── */}
-          <Text style={s.sectionLabel}>SECURITY</Text>
-          <View style={[s.card, secureMode ? s.cardArmed : null]}>
-            <LinearGradient
-              colors={
-                secureMode
-                  ? ['rgba(255,87,87,0.08)', 'rgba(255,87,87,0.02)']
-                  : ['rgba(255,255,255,0.03)', 'rgba(255,255,255,0)']
-              }
-              style={s.cardGrad}
-            >
-              <View style={s.cardRow}>
-                <View style={s.cardRowLeft}>
-                  <View style={[s.iconBox, {
-                    backgroundColor: secureMode ? THEME.dangerSoft : 'rgba(255,255,255,0.06)',
-                  }]}>
-                    <MaterialIcons
-                      name={secureMode ? 'lock' : 'lock-open'}
-                      size={22}
-                      color={secureMode ? THEME.danger : THEME.textSecond}
-                    />
-                  </View>
-                  <View style={s.cardTextWrap}>
-                    <Text style={s.cardTitle}>Secure Mode</Text>
-                    <Text style={[s.cardSub, { color: secureMode ? THEME.danger : THEME.textMuted }]}>
-                      {secureSub}
-                    </Text>
-                  </View>
-                </View>
-                <Switch
-                  value={secureMode}
-                  onValueChange={(v) => set(ref(database, 'modes/secure_mode'), v)}
-                  trackColor={{ false: 'rgba(255,255,255,0.1)', true: THEME.danger }}
-                  thumbColor="#FFFFFF"
-                />
+          {/* Emergency button */}
+          <TouchableOpacity onPress={goEmergency} activeOpacity={0.82} style={s.emergencyBtnWrap}>
+            <View style={s.emergencyBtn}>
+              <View style={s.emergencyIconWrap}>
+                <MaterialIcons name="emergency" size={20} color={THEME.danger} />
               </View>
-            </LinearGradient>
+              <View style={{ flex: 1 }}>
+                <Text style={s.emergencyBtnTitle}>Emergency Corner</Text>
+                <Text style={s.emergencyBtnSub}>Fire Extinguisher · Medical Help</Text>
+              </View>
+              <View style={s.emergencyChevronWrap}>
+                <MaterialIcons name="chevron-right" size={20} color={THEME.danger} />
+              </View>
+            </View>
+          </TouchableOpacity>
+
+          {/* ── SECURITY ── */}
+          <SectionLabel text="SECURITY" />
+
+          <View style={[s.card, secureMode && s.cardArmed]}>
+            <View style={s.cardRow}>
+              <View style={s.cardRowLeft}>
+                <View style={[s.iconBox, {
+                  backgroundColor: secureMode ? THEME.dangerSoft : THEME.surfaceAlt,
+                }]}>
+                  <MaterialIcons
+                    name={secureMode ? 'lock' : 'lock-open'}
+                    size={22}
+                    color={secureMode ? THEME.danger : THEME.textMuted}
+                  />
+                </View>
+                <View style={s.cardTextWrap}>
+                  <Text style={s.cardTitle}>Secure Mode</Text>
+                  <Text style={[s.cardSub, { color: secureMode ? THEME.danger : THEME.textMuted }]}>
+                    {secureSub}
+                  </Text>
+                </View>
+              </View>
+              <Switch
+                value={secureMode}
+                onValueChange={(v) => set(ref(database, 'modes/secure_mode'), v)}
+                trackColor={{ false: THEME.border, true: THEME.danger }}
+                thumbColor="#FFFFFF"
+                ios_backgroundColor={THEME.border}
+              />
+            </View>
           </View>
 
           {/* ── DEVICES ── */}
-          <Text style={s.sectionLabel}>DEVICES</Text>
+          <SectionLabel text="DEVICES" />
 
-          {/* LIGHT */}
-          <View style={[s.card, lightOn ? s.cardActive : null]}>
-            <LinearGradient
-              colors={
-                lightOn
-                  ? ['rgba(252,211,77,0.08)', 'rgba(252,211,77,0.02)']
-                  : ['rgba(255,255,255,0.03)', 'rgba(255,255,255,0)']
-              }
-              style={s.cardGrad}
-            >
-              <View style={s.cardRow}>
-                <View style={s.cardRowLeft}>
-                  <View style={[s.iconBox, {
-                    backgroundColor: lightOn ? THEME.yellowSoft : 'rgba(255,255,255,0.06)',
-                  }]}>
-                    <MaterialIcons
-                      name="lightbulb"
-                      size={22}
-                      color={lightOn ? THEME.yellow : THEME.textMuted}
-                    />
-                  </View>
-                  <View style={s.cardTextWrap}>
-                    <Text style={s.cardTitle}>Ceiling Light</Text>
-                    <Text style={[s.cardSub, { color: lightOn ? THEME.yellow : THEME.textMuted }]}>
-                      {lightSub}
-                    </Text>
-                  </View>
+          {/* Light card */}
+          <View style={[s.card, lightOn && s.cardActiveYellow]}>
+            <View style={s.cardRow}>
+              <View style={s.cardRowLeft}>
+                <View style={[s.iconBox, {
+                  backgroundColor: lightOn ? THEME.yellowSoft : THEME.surfaceAlt,
+                }]}>
+                  <MaterialIcons
+                    name="lightbulb"
+                    size={22}
+                    color={lightOn ? THEME.yellow : THEME.textMuted}
+                  />
                 </View>
-                <Switch
-                  value={lightOn}
-                  onValueChange={(v) => set(ref(database, 'devices/light'), v)}
-                  trackColor={{ false: 'rgba(255,255,255,0.1)', true: THEME.yellow }}
-                  thumbColor="#FFFFFF"
-                />
+                <View style={s.cardTextWrap}>
+                  <Text style={s.cardTitle}>Ceiling Light</Text>
+                  <Text style={[s.cardSub, { color: lightOn ? THEME.yellow : THEME.textMuted }]}>
+                    {lightSub}
+                  </Text>
+                </View>
               </View>
-            </LinearGradient>
+              <Switch
+                value={lightOn}
+                onValueChange={(v) => set(ref(database, 'devices/light'), v)}
+                trackColor={{ false: THEME.border, true: THEME.amber }}
+                thumbColor="#FFFFFF"
+                ios_backgroundColor={THEME.border}
+              />
+            </View>
           </View>
 
-          {/* FAN */}
-          <View style={[s.card, fanOn ? s.cardFan : null]}>
-            <LinearGradient
-              colors={
-                fanOn
-                  ? ['rgba(56,189,248,0.08)', 'rgba(56,189,248,0.02)']
-                  : ['rgba(255,255,255,0.03)', 'rgba(255,255,255,0)']
-              }
-              style={s.cardGrad}
-            >
-              <View style={s.cardRow}>
-                <View style={s.cardRowLeft}>
-                  <View style={[s.iconBox, {
-                    backgroundColor: fanOn ? THEME.skySoft : 'rgba(255,255,255,0.06)',
-                  }]}>
-                    <Animated.View style={{ transform: [{ rotate: fanSpin }] }}>
-                      <MaterialCommunityIcons
-                        name="fan"
-                        size={22}
-                        color={fanOn ? THEME.sky : THEME.textMuted}
-                      />
-                    </Animated.View>
-                  </View>
-                  <View style={s.cardTextWrap}>
-                    <Text style={s.cardTitle}>Ceiling Fan</Text>
-                    <Text style={[s.cardSub, { color: fanOn ? THEME.sky : THEME.textMuted }]}>
-                      {fanSubText}
-                    </Text>
-                  </View>
+          {/* Fan card */}
+          <View style={[s.card, fanOn && s.cardActiveSky]}>
+            <View style={s.cardRow}>
+              <View style={s.cardRowLeft}>
+                <View style={[s.iconBox, {
+                  backgroundColor: fanOn ? THEME.skySoft : THEME.surfaceAlt,
+                }]}>
+                  <Animated.View style={{ transform: [{ rotate: fanSpin }] }}>
+                    <MaterialCommunityIcons
+                      name="fan"
+                      size={22}
+                      color={fanOn ? THEME.sky : THEME.textMuted}
+                    />
+                  </Animated.View>
                 </View>
-                <Switch
-                  value={fanOn}
-                  onValueChange={(v) => set(ref(database, 'devices/fan'), v)}
-                  trackColor={{ false: 'rgba(255,255,255,0.1)', true: THEME.sky }}
-                  thumbColor="#FFFFFF"
-                />
+                <View style={s.cardTextWrap}>
+                  <Text style={s.cardTitle}>Ceiling Fan</Text>
+                  <Text style={[s.cardSub, { color: fanOn ? THEME.sky : THEME.textMuted }]}>
+                    {fanSubText}
+                  </Text>
+                </View>
               </View>
-            </LinearGradient>
+              <Switch
+                value={fanOn}
+                onValueChange={(v) => set(ref(database, 'devices/fan'), v)}
+                trackColor={{ false: THEME.border, true: THEME.sky }}
+                thumbColor="#FFFFFF"
+                ios_backgroundColor={THEME.border}
+              />
+            </View>
           </View>
 
           {/* ── SENSORS ── */}
-          <Text style={s.sectionLabel}>SENSORS</Text>
+          <SectionLabel text="SENSORS" />
 
           <View style={s.sensorGrid}>
             <SensorTile
-              icon="thermostat"
-              iconFamily="material"
-              label="Temperature"
-              value={tempVal}
-              color={THEME.warning}
-              bg={THEME.warningSoft}
-              badge=""
+              icon="thermostat" iconFamily="material"
+              label="Temperature" value={`${temperature}°C`}
+              color={THEME.warning} bg={THEME.warningSoft} badge=""
             />
             <SensorTile
-              icon="water-drop"
-              iconFamily="material"
-              label="Humidity"
-              value={humVal}
-              color={THEME.sky}
-              bg={THEME.skySoft}
-              badge=""
+              icon="water-drop" iconFamily="material"
+              label="Humidity" value={`${humidity}%`}
+              color={THEME.sky} bg={THEME.skySoft} badge=""
             />
             <SensorTile
-              icon="air"
-              iconFamily="material"
-              label="Gas Level"
-              value={gasVal}
-              color={gasColor}
-              bg={gasBg}
-              badge={gasBadge}
+              icon="air" iconFamily="material"
+              label="Gas Level" value={gasVal}
+              color={gasColor} bg={gasBg} badge={gasBadge}
             />
             <SensorTile
-              icon={motion ? 'directions-walk' : 'accessibility-new'}
-              iconFamily="material"
-              label="Motion"
-              value={motionVal}
-              color={motion ? '#A78BFA' : THEME.textMuted}
-              bg={motion ? 'rgba(167,139,250,0.1)' : 'rgba(255,255,255,0.03)'}
+              icon={motion ? 'directions-walk' : 'accessibility-new'} iconFamily="material"
+              label="Motion" value={motionVal}
+              color={motion ? THEME.violet : THEME.textMuted}
+              bg={motion ? THEME.violetSoft : THEME.surfaceAlt}
               badge=""
             />
 
@@ -505,7 +514,9 @@ export default function HomeScreen() {
               ]}>
                 <View style={s.sensorTileTop}>
                   <View style={[s.sensorIconBox, {
-                    backgroundColor: fireStatus ? 'rgba(255,87,87,0.2)' : 'rgba(34,211,165,0.2)',
+                    backgroundColor: fireStatus
+                      ? 'rgba(220,38,38,0.15)'
+                      : 'rgba(5,150,105,0.15)',
                   }]}>
                     <MaterialIcons
                       name={fireStatus ? 'local-fire-department' : 'verified-user'}
@@ -513,20 +524,19 @@ export default function HomeScreen() {
                       color={fireStatus ? THEME.danger : THEME.success}
                     />
                   </View>
-                  <View>
+                  <View style={{ flex: 1 }}>
                     <Text style={s.sensorLabel}>Fire Status</Text>
-                    <Text style={[s.fireTileBadge, { color: fireStatus ? THEME.danger : THEME.success }]}>
-                      {fireBadgeText}
-                    </Text>
+                    <Text style={[s.fireTileBadge, {
+                      color: fireStatus ? THEME.danger : THEME.success,
+                    }]}>{fireBadgeText}</Text>
                   </View>
-                  <View style={s.spacer} />
                   <View style={[s.statusDot, {
                     backgroundColor: fireStatus ? THEME.danger : THEME.success,
                   }]} />
                 </View>
-                <Text style={[s.sensorValueWide, { color: fireStatus ? THEME.danger : THEME.success }]}>
-                  {fireMainText}
-                </Text>
+                <Text style={[s.sensorValueWide, {
+                  color: fireStatus ? THEME.danger : THEME.success,
+                }]}>{fireMainText}</Text>
               </View>
             </View>
           </View>
@@ -537,52 +547,44 @@ export default function HomeScreen() {
 
       {/* ── MIC FAB ── */}
       <Animated.View style={[s.micWrap, { transform: [{ scale: scaleAnim }] }]}>
-        {micActive ? <View style={s.micRing} /> : null}
+        {micActive && <View style={s.micRing} />}
         <TouchableOpacity onPress={handleMicPress} activeOpacity={0.85}>
           <LinearGradient
-            colors={micActive ? [THEME.success, '#16A34A'] : [THEME.accent, '#9B8CFF']}
+            colors={micActive
+              ? [THEME.success, '#047857']
+              : [THEME.accent, THEME.accentDark]}
             style={s.micBtn}
           >
-            <MaterialIcons
-              name={micActive ? 'mic' : 'mic-none'}
-              size={26}
-              color="#FFFFFF"
-            />
+            <MaterialIcons name={micActive ? 'mic' : 'mic-none'} size={26} color="#FFFFFF" />
           </LinearGradient>
         </TouchableOpacity>
-        {micActive ? <Text style={s.micHint}>Listening...</Text> : null}
+        {micActive && <Text style={s.micHint}>Listening…</Text>}
       </Animated.View>
 
       {/* ── FOOTER NAV ── */}
       <View style={s.footerWrap}>
-        <LinearGradient
-          colors={['rgba(10,10,20,0)', '#0A0A14']}
-          style={s.footerBlur}
-        />
+        <View style={s.footerTopBorder} />
         <SafeAreaView edges={['bottom']} style={s.footer}>
           <TouchableOpacity onPress={goHome} style={s.footerTab} activeOpacity={0.7}>
-            <View style={[s.footerIconWrap, pathname === '/' ? s.footerIconActive : null]}>
+            <View style={[s.footerIconWrap, pathname === '/' && s.footerIconActive]}>
               <MaterialIcons
                 name="home"
                 size={22}
                 color={pathname === '/' ? THEME.accent : THEME.textMuted}
               />
             </View>
-            <Text style={[s.footerText, pathname === '/' ? s.footerTextActive : null]}>
-              Home
-            </Text>
+            <Text style={[s.footerText, pathname === '/' && s.footerTextActive]}>Home</Text>
           </TouchableOpacity>
+
           <TouchableOpacity onPress={goLogs} style={s.footerTab} activeOpacity={0.7}>
-            <View style={[s.footerIconWrap, pathname === '/logs' ? s.footerIconActive : null]}>
+            <View style={[s.footerIconWrap, pathname === '/logs' && s.footerIconActive]}>
               <MaterialIcons
                 name="history"
                 size={22}
                 color={pathname === '/logs' ? THEME.accent : THEME.textMuted}
               />
             </View>
-            <Text style={[s.footerText, pathname === '/logs' ? s.footerTextActive : null]}>
-              Logs
-            </Text>
+            <Text style={[s.footerText, pathname === '/logs' && s.footerTextActive]}>Logs</Text>
           </TouchableOpacity>
         </SafeAreaView>
       </View>
@@ -590,17 +592,16 @@ export default function HomeScreen() {
   );
 }
 
-/* ══════════════════════════════════════════
-   SENSOR TILE
-══════════════════════════════════════════ */
+/* ── Helper: Section Label ── */
+function SectionLabel({ text }: { text: string }) {
+  return <Text style={s.sectionLabel}>{text}</Text>;
+}
+
+/* ── Helper: Sensor Tile ── */
 type SensorTileProps = {
-  icon: string;
-  iconFamily: 'material' | 'community';
-  label: string;
-  value: string;
-  color: string;
-  bg: string;
-  badge: string;
+  icon: string; iconFamily: 'material' | 'community';
+  label: string; value: string;
+  color: string; bg: string; badge: string;
 };
 
 function SensorTile({ icon, iconFamily, label, value, color, bg, badge }: SensorTileProps) {
@@ -611,17 +612,16 @@ function SensorTile({ icon, iconFamily, label, value, color, bg, badge }: Sensor
           <View style={[s.sensorIconBox, { backgroundColor: color + '22' }]}>
             {iconFamily === 'community'
               ? <MaterialCommunityIcons name={icon as any} size={20} color={color} />
-              : <MaterialIcons name={icon as any} size={20} color={color} />
-            }
+              : <MaterialIcons name={icon as any} size={20} color={color} />}
           </View>
           <Text style={s.sensorLabel}>{label}</Text>
         </View>
         <Text style={[s.sensorValue, { color }]}>{value}</Text>
-        {badge !== '' ? (
+        {badge !== '' && (
           <View style={[s.sensorBadgeBox, { backgroundColor: color + '22' }]}>
             <Text style={[s.sensorBadgeText, { color }]}>{badge}</Text>
           </View>
-        ) : null}
+        )}
       </View>
     </View>
   );
@@ -633,67 +633,101 @@ function SensorTile({ icon, iconFamily, label, value, color, bg, badge }: Sensor
 const s = StyleSheet.create({
   root:          { flex: 1, backgroundColor: THEME.bg },
   scroll:        { flex: 1 },
-  scrollContent: { paddingHorizontal: 16, paddingTop: 18, paddingBottom: 20 },
-  spacer:        { flex: 1 },
+  scrollContent: { paddingHorizontal: 16, paddingTop: 16, paddingBottom: 20 },
   bottomPad:     { height: 120 },
 
   /* ── Header ── */
-  header: { paddingBottom: 18, overflow: 'hidden' },
+  safeHeader: {
+    backgroundColor: '#FFFFFF',
+  },
+  header: {
+    paddingBottom: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: THEME.border,
+    // Subtle drop shadow beneath header
+    shadowColor: THEME.shadowMd,
+    shadowOpacity: 1,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 6,
+    overflow: 'hidden',
+  },
   headerOrb: {
-    position: 'absolute', top: -60, right: -30,
-    width: 200, height: 200, borderRadius: 100,
-    backgroundColor: 'rgba(108,99,255,0.12)',
+    position: 'absolute', top: -50, right: -20,
+    width: 180, height: 180, borderRadius: 90,
+    backgroundColor: 'rgba(14,165,233,0.07)',
   },
   headerOrb2: {
-    position: 'absolute', top: 20, left: -50,
-    width: 140, height: 140, borderRadius: 70,
-    backgroundColor: 'rgba(108,99,255,0.06)',
+    position: 'absolute', bottom: -30, left: -30,
+    width: 120, height: 120, borderRadius: 60,
+    backgroundColor: 'rgba(124,58,237,0.05)',
   },
   headerInner: {
-    paddingHorizontal: 20, paddingTop: 10,
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    paddingHorizontal: 18,
+    paddingTop: 8,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  headerBrand: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  headerBrand: { flexDirection: 'row', alignItems: 'center', gap: 11 },
   headerIconGrad: {
-    width: 42, height: 42, borderRadius: 13,
+    width: 40, height: 40, borderRadius: 12,
     alignItems: 'center', justifyContent: 'center',
-    shadowColor: THEME.accent, shadowOpacity: 0.5,
-    shadowRadius: 8, shadowOffset: { width: 0, height: 3 }, elevation: 6,
+    shadowColor: THEME.accent, shadowOpacity: 0.35,
+    shadowRadius: 8, shadowOffset: { width: 0, height: 3 }, elevation: 5,
   },
-  headerSub:   { color: THEME.textMuted,   fontSize: 9,  fontWeight: '800', letterSpacing: 3 },
-  headerTitle: { color: THEME.textPrimary, fontSize: 26, fontWeight: '900', letterSpacing: -0.5, marginTop: 1 },
+  headerSub: {
+    color: THEME.textMuted, fontSize: 9, fontWeight: '800', letterSpacing: 3,
+  },
+  headerTitle: {
+    color: THEME.textPrimary, fontSize: 24, fontWeight: '900', letterSpacing: -0.6, marginTop: 1,
+  },
   headerRight: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   deviceCountPill: {
+    flexDirection: 'row', alignItems: 'center', gap: 5,
     backgroundColor: THEME.accentSoft,
-    paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20,
-    borderWidth: 1, borderColor: 'rgba(108,99,255,0.2)',
+    paddingHorizontal: 10, paddingVertical: 5,
+    borderRadius: 20,
+    borderWidth: 1, borderColor: 'rgba(14,165,233,0.2)',
   },
-  deviceCountText: { color: THEME.accent, fontSize: 11, fontWeight: '700' },
+  pillDot: { width: 6, height: 6, borderRadius: 3 },
+  deviceCountText: { fontSize: 11, fontWeight: '700' },
   livePill: {
-    flexDirection: 'row', alignItems: 'center', gap: 6,
-    backgroundColor: 'rgba(34,211,165,0.1)',
-    paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20,
-    borderWidth: 1, borderColor: 'rgba(34,211,165,0.2)',
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    backgroundColor: THEME.successSoft,
+    paddingHorizontal: 10, paddingVertical: 5,
+    borderRadius: 20,
+    borderWidth: 1, borderColor: 'rgba(5,150,105,0.2)',
   },
-  liveDot:  { width: 7, height: 7, borderRadius: 4, backgroundColor: THEME.success },
+  liveDot:  { width: 6, height: 6, borderRadius: 3, backgroundColor: THEME.success },
   liveText: { color: THEME.success, fontSize: 10, fontWeight: '800', letterSpacing: 2 },
+
   headerStats: {
     flexDirection: 'row', alignItems: 'center',
-    marginHorizontal: 20, marginTop: 14,
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderRadius: 14, paddingHorizontal: 16, paddingVertical: 10,
+    marginHorizontal: 18, marginTop: 12,
+    backgroundColor: THEME.bg,
+    borderRadius: 14, paddingHorizontal: 14, paddingVertical: 10,
     borderWidth: 1, borderColor: THEME.border,
   },
-  headerStat:        { flexDirection: 'row', alignItems: 'center', gap: 6, flex: 1, justifyContent: 'center' },
-  headerStatVal:     { color: THEME.textSecond, fontSize: 13, fontWeight: '700' },
-  headerStatDivider: { width: 1, height: 16, backgroundColor: THEME.border },
+  headerStat: {
+    flexDirection: 'row', alignItems: 'center',
+    gap: 7, flex: 1, justifyContent: 'center',
+  },
+  statIcon: {
+    width: 24, height: 24, borderRadius: 7,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  headerStatVal: {
+    color: THEME.textSecond, fontSize: 13, fontWeight: '700',
+  },
+  headerStatDivider: { width: 1, height: 18, backgroundColor: THEME.border },
 
   /* ── Fire Banner ── */
   fireBanner: {
     flexDirection: 'row', alignItems: 'center', gap: 12,
     borderRadius: 16, padding: 16,
-    shadowColor: '#FF3B3B', shadowOpacity: 0.4,
-    shadowRadius: 12, shadowOffset: { width: 0, height: 4 }, elevation: 8,
+    shadowColor: '#DC2626', shadowOpacity: 0.25,
+    shadowRadius: 12, shadowOffset: { width: 0, height: 4 }, elevation: 6,
   },
   fireBannerIcon: {
     width: 42, height: 42, borderRadius: 12,
@@ -701,78 +735,126 @@ const s = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   fireBannerTextWrap: { flex: 1 },
-  fireBannerTitle: { color: '#FFFFFF', fontSize: 15, fontWeight: '800', letterSpacing: 0.3 },
-  fireBannerSub:   { color: 'rgba(255,255,255,0.7)', fontSize: 12, marginTop: 2 },
+  fireBannerTitle: { color: '#FFFFFF', fontSize: 15, fontWeight: '800', letterSpacing: 0.2 },
+  fireBannerSub:   { color: 'rgba(255,255,255,0.75)', fontSize: 12, marginTop: 2 },
+
+  /* ── Emergency ── */
+  emergencyBtnWrap: { marginBottom: 14 },
+  emergencyBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 12,
+    paddingHorizontal: 16, paddingVertical: 14,
+    borderRadius: 16,
+    backgroundColor: THEME.surface,
+    borderWidth: 1, borderColor: 'rgba(220,38,38,0.2)',
+    shadowColor: THEME.shadow, shadowOpacity: 1,
+    shadowRadius: 6, shadowOffset: { width: 0, height: 2 }, elevation: 3,
+  },
+  emergencyIconWrap: {
+    width: 40, height: 40, borderRadius: 12,
+    backgroundColor: THEME.dangerSoft,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  emergencyChevronWrap: {
+    width: 28, height: 28, borderRadius: 8,
+    backgroundColor: THEME.dangerSoft,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  emergencyBtnTitle: { color: THEME.textPrimary, fontSize: 15, fontWeight: '700' },
+  emergencyBtnSub:   { color: THEME.textMuted, fontSize: 11, marginTop: 2, fontWeight: '500' },
 
   /* ── Section label ── */
   sectionLabel: {
     color: THEME.textMuted, fontSize: 10, fontWeight: '800',
-    letterSpacing: 3, marginBottom: 10, marginTop: 8, marginLeft: 2,
+    letterSpacing: 2.5, marginBottom: 10, marginTop: 6, marginLeft: 2,
   },
 
-  /* ── Card ── */
+  /* ── Cards ── */
   card: {
-    borderRadius: 18, marginBottom: 10,
+    backgroundColor: THEME.surface,
+    borderRadius: 16, marginBottom: 10,
     borderWidth: 1, borderColor: THEME.border,
-    overflow: 'hidden', backgroundColor: THEME.surface,
+    shadowColor: THEME.shadow, shadowOpacity: 1,
+    shadowRadius: 6, shadowOffset: { width: 0, height: 2 }, elevation: 3,
+    overflow: 'hidden',
   },
-  cardGrad:    {},
-  cardActive:  { borderColor: 'rgba(252,211,77,0.25)' },
-  cardArmed:   { borderColor: 'rgba(255,87,87,0.3)' },
-  cardFan:     { borderColor: 'rgba(56,189,248,0.25)' },
-  cardRow:     { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16 },
-  cardRowLeft: { flexDirection: 'row', alignItems: 'center', gap: 14, flex: 1 },
-  cardTextWrap:{ flex: 1 },
-  cardTitle:   { color: THEME.textPrimary, fontSize: 15, fontWeight: '700' },
-  cardSub:     { color: THEME.textMuted,   fontSize: 12, marginTop: 2, fontWeight: '500' },
-  textSecond:  { color: THEME.textSecond },
+  cardActiveYellow: { borderColor: 'rgba(217,119,6,0.3)' },
+  cardActiveSky:    { borderColor: 'rgba(14,165,233,0.3)' },
+  cardArmed:        { borderColor: 'rgba(220,38,38,0.3)' },
+  cardRow: {
+    flexDirection: 'row', justifyContent: 'space-between',
+    alignItems: 'center', padding: 16,
+  },
+  cardRowLeft:  { flexDirection: 'row', alignItems: 'center', gap: 14, flex: 1 },
+  cardTextWrap: { flex: 1 },
+  cardTitle:    { color: THEME.textPrimary, fontSize: 15, fontWeight: '700' },
+  cardSub:      { color: THEME.textMuted, fontSize: 12, marginTop: 2, fontWeight: '500' },
+  iconBox: {
+    width: 46, height: 46, borderRadius: 14,
+    alignItems: 'center', justifyContent: 'center',
+  },
 
-  /* Icon box */
-  iconBox: { width: 46, height: 46, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
-
-  /* ── Sensor grid ── */
+  /* ── Sensor Grid ── */
   sensorGrid:      { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   sensorTile:      { width: '48%' },
   sensorTileWide:  { width: '100%' },
-  sensorTileInner: { borderRadius: 18, padding: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
-  sensorTileTop:   { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 14 },
-  sensorIconBox:   { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
-  sensorLabel:     { color: THEME.textSecond, fontSize: 11, fontWeight: '600', flex: 1 },
-  fireTileBadge:   { fontSize: 10, fontWeight: '800', letterSpacing: 1 },
-  sensorValue:     { fontSize: 28, fontWeight: '900', letterSpacing: -1 },
-  sensorValueWide: { fontSize: 20, fontWeight: '800', letterSpacing: -0.5, marginTop: 4 },
-  sensorBadgeBox:  { alignSelf: 'flex-start', marginTop: 6, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
+  sensorTileInner: {
+    borderRadius: 16, padding: 14,
+    borderWidth: 1, borderColor: 'rgba(15,23,42,0.06)',
+    shadowColor: THEME.shadow, shadowOpacity: 0.6,
+    shadowRadius: 4, shadowOffset: { width: 0, height: 1 }, elevation: 2,
+  },
+  sensorTileTop: {
+    flexDirection: 'row', alignItems: 'center',
+    gap: 8, marginBottom: 12,
+  },
+  sensorIconBox: {
+    width: 34, height: 34, borderRadius: 10,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  sensorLabel:    { color: THEME.textSecond, fontSize: 11, fontWeight: '600', flex: 1 },
+  fireTileBadge:  { fontSize: 10, fontWeight: '800', letterSpacing: 1, marginTop: 1 },
+  sensorValue:    { fontSize: 28, fontWeight: '900', letterSpacing: -1 },
+  sensorValueWide:{ fontSize: 20, fontWeight: '800', letterSpacing: -0.5, marginTop: 2 },
+  sensorBadgeBox: {
+    alignSelf: 'flex-start', marginTop: 6,
+    paddingHorizontal: 7, paddingVertical: 3, borderRadius: 6,
+  },
   sensorBadgeText: { fontSize: 9, fontWeight: '800', letterSpacing: 1.5 },
   statusDot:       { width: 8, height: 8, borderRadius: 4 },
 
   /* ── Mic FAB ── */
-  micWrap: { position: 'absolute', bottom: 96, right: 20, alignItems: 'center' },
+  micWrap: { position: 'absolute', bottom: 94, right: 18, alignItems: 'center' },
   micRing: {
     position: 'absolute',
-    width: 76, height: 76, borderRadius: 38,
-    borderWidth: 2, borderColor: THEME.success, opacity: 0.4,
+    width: 74, height: 74, borderRadius: 37,
+    borderWidth: 2, borderColor: THEME.success, opacity: 0.45,
   },
   micBtn: {
-    width: 60, height: 60, borderRadius: 30,
+    width: 58, height: 58, borderRadius: 29,
     justifyContent: 'center', alignItems: 'center',
-    elevation: 12,
-    shadowColor: THEME.accent, shadowOpacity: 0.5,
-    shadowRadius: 14, shadowOffset: { width: 0, height: 5 },
+    elevation: 10,
+    shadowColor: THEME.accent, shadowOpacity: 0.4,
+    shadowRadius: 12, shadowOffset: { width: 0, height: 4 },
   },
-  micHint: { color: THEME.success, fontSize: 9, fontWeight: '800', marginTop: 7, letterSpacing: 1.5 },
+  micHint: {
+    color: THEME.success, fontSize: 9, fontWeight: '800',
+    marginTop: 6, letterSpacing: 1.5,
+  },
 
-  /* ── Footer ── */
+  /* ── Footer Nav ── */
   footerWrap: { position: 'absolute', bottom: 0, left: 0, right: 0 },
-  footerBlur: { height: 20 },
+  footerTopBorder: { height: 1, backgroundColor: THEME.border },
   footer: {
     flexDirection: 'row',
     backgroundColor: THEME.surface,
-    borderTopWidth: 1, borderTopColor: THEME.border,
     paddingTop: 4,
   },
-  footerTab:        { flex: 1, alignItems: 'center', paddingVertical: 8, gap: 4 },
-  footerIconWrap:   { width: 48, height: 32, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
+  footerTab:        { flex: 1, alignItems: 'center', paddingVertical: 8, gap: 3 },
+  footerIconWrap:   {
+    width: 46, height: 30, borderRadius: 9,
+    alignItems: 'center', justifyContent: 'center',
+  },
   footerIconActive: { backgroundColor: THEME.accentSoft },
   footerText:       { color: THEME.textMuted, fontSize: 11, fontWeight: '600' },
-  footerTextActive: { color: THEME.accent, fontWeight: '800' },
+  footerTextActive: { color: THEME.accent,    fontWeight: '800' },
 });
